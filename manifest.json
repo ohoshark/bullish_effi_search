@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Equipment Efficiency Analyzer",
+  "version": "1.0",
+  "description": "Click the extension icon to analyze equipment efficiency.",
+  "permissions": ["scripting", "activeTab"],
+  "host_permissions": ["https://game.bullas.xyz/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    },
+    "default_title": "Analyze Efficiency"
+  }
+}
