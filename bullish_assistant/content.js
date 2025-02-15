@@ -14,37 +14,92 @@
     searchIcon.title = 'Analyze Efficiency'; // 툴팁 추가
     storeHeading.appendChild(searchIcon);
 
-    // 3. 실행 아이콘 추가
+    // 3. 번개 실행 아이콘 추가
     const executeIcon = document.createElement('span');
-    executeIcon.innerHTML = '⚡'; // 실행 아이콘 (이모지 사용)
+    executeIcon.innerHTML = '⚡'; // 번개 아이콘 (이모지 사용)
     executeIcon.style.cursor = 'pointer';
     executeIcon.style.marginLeft = '10px'; // 간격 조정
     executeIcon.title = 'Execute Purchase'; // 툴팁 추가
     storeHeading.appendChild(executeIcon);
 
-    // 4. 돋보기 아이콘 클릭 이벤트 추가
+    // 4. Auto 토글 버튼 추가
+    const autoToggle = document.createElement('span');
+    autoToggle.innerHTML = '🔄'; // Auto 토글 아이콘 (이모지 사용)
+    autoToggle.style.cursor = 'pointer';
+    autoToggle.style.marginLeft = '10px'; // 간격 조정
+    autoToggle.title = 'Toggle Auto Mode'; // 툴팁 추가
+    autoToggle.dataset.active = 'false'; // 초기 상태: 비활성화
+    storeHeading.appendChild(autoToggle);
+
+    // 5. 돋보기 아이콘 클릭 이벤트 추가
     searchIcon.addEventListener('click', () => {
         analyzeEquipmentEfficiency(); // 스크립트 실행
     });
 
-    // 5. 실행 아이콘 클릭 이벤트 추가
+    // 6. 번개 아이콘 클릭 이벤트 추가
     executeIcon.addEventListener('click', () => {
         clickPurchaseButton(); // Purchase 버튼 클릭
     });
 
-    // 6. Purchase 버튼 클릭 함수
+    // 7. Auto 토글 버튼 클릭 이벤트 추가
+    autoToggle.addEventListener('click', () => {
+        const isActive = autoToggle.dataset.active === 'true';
+        if (isActive) {
+            autoToggle.dataset.active = 'false';
+            autoToggle.style.color = ''; // 기본 색상으로 복원
+            console.log('Auto mode deactivated.');
+        } else {
+            autoToggle.dataset.active = 'true';
+            autoToggle.style.color = 'green'; // 활성화 상태 강조
+            console.log('Auto mode activated.');
+            runAutoMode(); // Auto 모드 실행
+        }
+    });
+
+    // 8. Purchase 버튼 클릭 함수
     function clickPurchaseButton() {
         const purchaseButton = Array.from(document.querySelectorAll('button')).find(button => button.textContent.trim() === 'Purchase');
 
         if (purchaseButton) {
             purchaseButton.click();
             console.log('Purchase button clicked!');
+            return true; // 클릭 성공
         } else {
             console.error('Purchase button not found!');
+            return false; // 버튼 없음
         }
     }
 
-    // 7. 장비 효율 분석 함수 (수정된 부분 포함)
+    // 9. Auto 모드 실행 함수
+    async function runAutoMode() {
+        while (autoToggle.dataset.active === 'true') {
+            console.log('Running Auto Mode...');
+
+            // 1. Loading 상태 확인
+            const loadingElement = document.querySelector('div[aria-label="Loading"]');
+            if (loadingElement) {
+                console.log('Loading detected. Pausing...');
+                // Loading 상태가 사라질 때까지 대기
+                while (document.querySelector('div[aria-label="Loading"]')) {
+                    await new Promise(resolve => setTimeout(resolve, 500)); // 0.5초마다 체크
+                }
+                await new Promise(resolve => setTimeout(resolve, 2000)); // 약간의 딜레이 추가
+                console.log('Loading finished. Resuming...');
+            }
+
+            // 2. 돋보기 실행
+            await analyzeEquipmentEfficiency();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            // 3. 번개 실행
+            clickPurchaseButton();
+
+            // 4. 1초 대기
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        console.log('Auto mode stopped.');
+    }
+
+    // 10. 장비 효율 분석 함수 (기존 코드)
     async function analyzeEquipmentEfficiency() {
         const equipmentSection = Array.from(document.querySelectorAll('section')).find(section =>
             section.querySelector('h3')?.textContent.includes('Equipment')
